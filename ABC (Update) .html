@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7x7 細明體字母數字顯示器</title>
+    <title>字母數字顯示器</title>
     <script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js"></script>
     <style>
@@ -63,11 +63,18 @@
             text-align: center;
             color: #555;
         }
+        .display-container {
+            max-height: 500px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: white;
+        }
     </style>
 </head>
 <body onload="brython()">
     <div class="container">
-        <h1>7x7 細明體字母數字顯示器</h1>
+        <h1>字母數字顯示器</h1>
         <p style="text-align: center; color: #666;">
             輸入英文字母或數字（大小寫有不同設計），程式會用彩色方塊顯示7x7細明體風格字體
         </p>
@@ -77,8 +84,6 @@
             <button class="display-btn" id="displayBtn">顯示</button>
             <button class="clear-btn" id="clearBtn">清除</button>
         </div>
-
-        <div id="brython_div1"></div>
 
         <div class="section">
             <div class="section-title">快速範例</div>
@@ -94,12 +99,14 @@
                 <button class="example-btn" data-text="A strict teacher produces excellent students">A strict teacher produces excellent students</button>
             </div>
         </div>
+
+        <div class="display-container" id="brython_div1"></div>
     </div>
 
     <script type="text/python">
 from browser import document, html, timer
 
-CELL_SIZE = 25
+CELL_SIZE = 20  # 保持格子大小不變
 IMG_PATH = "https://mde.tw/cp2025/reeborg/src/images/"
 
 # ------------------ 7x7 字母點陣定義（細明體風格，線條粗一格） ------------------
@@ -253,7 +260,7 @@ class LetterDisplay:
         # 分割文本为单词
         words = text.split(' ')
         
-        # 计算世界大小
+        # 计算世界大小 - 确保整个单词在同一行
         max_line_width = 0
         current_line_width = 0
         line_count = 1
@@ -262,36 +269,21 @@ class LetterDisplay:
             # 计算单词长度（每个字母7格 + 字母间1格间距）
             word_length = len(word) * 8 - 1 if len(word) > 0 else 0
             
-            # 如果单词长度超过6个字母，需要换行
-            if len(word) > 6:
-                # 如果当前行已经有内容，先换行
-                if current_line_width > 0:
-                    line_count += 1
-                    current_line_width = 0
-                
-                # 将长单词分割成多行
-                for i in range(0, len(word), 6):
-                    segment = word[i:i+6]
-                    segment_length = len(segment) * 8 - 1 if len(segment) > 0 else 0
-                    max_line_width = max(max_line_width, segment_length)
-                    
-                    # 如果不是最后一个片段，增加行数
-                    if i + 6 < len(word):
-                        line_count += 1
+            # 检查当前行是否能容纳这个单词
+            if current_line_width + word_length > 0 and current_line_width + word_length > 120:  # 限制行宽
+                # 需要换行
+                line_count += 1
+                current_line_width = word_length
             else:
-                # 检查当前行是否能容纳这个单词
-                if current_line_width + word_length > 6 * 8 - 1:
-                    # 需要换行
-                    line_count += 1
-                    current_line_width = word_length
-                else:
-                    # 可以放在当前行
-                    current_line_width += word_length + 1  # +1 是单词间的空格
-                
-                max_line_width = max(max_line_width, current_line_width)
+                # 可以放在当前行
+                if current_line_width > 0:
+                    current_line_width += 8  # 单词间空格（空一个单字的区域）
+                current_line_width += word_length
+            
+            max_line_width = max(max_line_width, current_line_width)
         
-        # 设置世界大小
-        world_width = max_line_width
+        # 设置世界大小 - 增加宽度以容纳更多内容
+        world_width = max(max_line_width, 120)  # 最小宽度为120格
         world_height = line_count * 7  # 每行7格高
         
         self.world = World(world_width, world_height)
@@ -324,38 +316,21 @@ class LetterDisplay:
         color_index = 0
         
         for word in words:
-            # 如果单词长度超过6个字母，需要分割
-            if len(word) > 6:
-                # 如果当前行已经有内容，先换行
-                if current_x > 0:
-                    current_x = 0
-                    current_y += 7
-                
-                # 将长单词分割成多行
-                for i in range(0, len(word), 6):
-                    segment = word[i:i+6]
-                    self._draw_word(segment, current_x, current_y, color_index)
-                    
-                    # 移动到下一行
-                    current_x = 0
-                    current_y += 7
-                    color_index += 1
-            else:
-                # 计算单词长度
-                word_length = len(word) * 8 - 1 if len(word) > 0 else 0
-                
-                # 检查当前行是否能容纳这个单词
-                if current_x + word_length > 6 * 8 - 1:
-                    # 需要换行
-                    current_x = 0
-                    current_y += 7
-                
-                # 绘制单词
-                self._draw_word(word, current_x, current_y, color_index)
-                
-                # 更新位置（单词间加一个空格）
-                current_x += word_length + 1
-                color_index += 1
+            # 计算单词长度
+            word_length = len(word) * 8 - 1 if len(word) > 0 else 0
+            
+            # 检查当前行是否能容纳这个单词
+            if current_x + word_length > 120 and current_x > 0:  # 限制行宽，但确保单词完整
+                # 需要换行
+                current_x = 0
+                current_y += 7
+            
+            # 绘制单词
+            self._draw_word(word, current_x, current_y, color_index)
+            
+            # 更新位置（单词间加一个空格 - 空一个单字的区域）
+            current_x += word_length + 8  # 8格 = 7格字母 + 1格间距
+            color_index += 1
     
     def _draw_word(self, word, start_x, start_y, color_index):
         # 绘制单词中的所有字母
