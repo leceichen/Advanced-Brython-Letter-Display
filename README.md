@@ -1,1 +1,1 @@
-# -Brython---
+# Advanced Brython Letter Display
