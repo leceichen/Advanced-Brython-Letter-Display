@@ -24,19 +24,19 @@
  ## ⚙️ 運作原理
 1️⃣ Brython 與前端結構
 
-Brython 讓 Python 程式可在瀏覽器中運行，取代 JavaScript。
-HTML 中的 <script type="text/python"> 區塊即是主要邏輯。
+Brython 讓 Python 程式可在瀏覽器中運行，取代 JavaScript
+HTML 中的 <script type="text/python"> 區塊即是主要邏輯
 
 主要組成部分：
 
-HTML + CSS：定義按鈕、輸入框與顯示區域。
+HTML + CSS：定義按鈕、輸入框與顯示區域
 
-Brython：以 Python 控制 DOM、Canvas、按鈕事件。
+Brython：以 Python 控制 DOM、Canvas、按鈕事件
 #
 
 2️⃣ 顯示核心（點陣繪製邏輯）
 
-每個字元（如 A, B, 1, 2, …）在字典 LETTER_PATTERNS 中定義。
+每個字元（如 A, B, 1, 2, …）在字典 LETTER_PATTERNS 中定義
 範例：
 
 'A': ["0011100",
@@ -48,38 +48,38 @@ Brython：以 Python 控制 DOM、Canvas、按鈕事件。
       "1100011"]
 
 
-每一行代表 7 個像素點，1 為有色方格，0 為空白。
+每一行代表 7 個像素點，1 為有色方格，0 為空白
 #
 
 3️⃣ World 類別（繪圖世界）
 
 負責建立一個 Canvas「世界」：
 
-有三層：grid（格線）、background（背景）、display（顯示層）。
+有三層：grid（格線）、background（背景）、display（顯示層）
 
 每一格方塊為 25px × 25px。
 
-使用 draw_color_block(x, y, color) 於指定座標畫出有色方格。
+使用 draw_color_block(x, y, color) 於指定座標畫出有色方格
 #
 
 4️⃣ LetterDisplay 類別（顯示控制）
 
-接收輸入文字，依照字數建立對應寬度的繪圖世界。
+接收輸入文字，依照字數建立對應寬度的繪圖世界
 
-逐字取出 LETTER_PATTERNS 中的資料，依序繪製。
+逐字取出 LETTER_PATTERNS 中的資料，依序繪製
 
-每個字元顏色不同，從 self.colors 中循環取色。
+每個字元顏色不同，從 self.colors 中循環取色
 #
 
 5️⃣ 互動操作
 
 透過 Brython 綁定按鈕與輸入事件：
 
-「顯示」：讀取輸入框內容並呼叫 display.display_text()。
+「顯示」：讀取輸入框內容並呼叫 display.display_text()
 
-「清除」：清空輸入框與顯示區。
+「清除」：清空輸入框與顯示區
 
-範例按鈕：快速輸入並顯示預設字串。
+範例按鈕：快速輸入並顯示預設字串
 
-按下 Enter 鍵也能觸發顯示。
-#
+按下 Enter 鍵也能觸發顯示
+
