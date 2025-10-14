@@ -21,7 +21,7 @@
 
 - 瀏覽器直接運行 – 無需安裝，透過 GitHub Pages 即可使用
 
-  ## ⚙️ 運作原理
+ ## ⚙️ 運作原理
 1️⃣ Brython 與前端結構
 
 Brython 讓 Python 程式可在瀏覽器中運行，取代 JavaScript。
@@ -32,6 +32,7 @@ HTML 中的 <script type="text/python"> 區塊即是主要邏輯。
 HTML + CSS：定義按鈕、輸入框與顯示區域。
 
 Brython：以 Python 控制 DOM、Canvas、按鈕事件。
+#
 
 2️⃣ 顯示核心（點陣繪製邏輯）
 
@@ -48,6 +49,7 @@ Brython：以 Python 控制 DOM、Canvas、按鈕事件。
 
 
 每一行代表 7 個像素點，1 為有色方格，0 為空白。
+#
 
 3️⃣ World 類別（繪圖世界）
 
@@ -58,6 +60,7 @@ Brython：以 Python 控制 DOM、Canvas、按鈕事件。
 每一格方塊為 25px × 25px。
 
 使用 draw_color_block(x, y, color) 於指定座標畫出有色方格。
+#
 
 4️⃣ LetterDisplay 類別（顯示控制）
 
@@ -66,6 +69,7 @@ Brython：以 Python 控制 DOM、Canvas、按鈕事件。
 逐字取出 LETTER_PATTERNS 中的資料，依序繪製。
 
 每個字元顏色不同，從 self.colors 中循環取色。
+#
 
 5️⃣ 互動操作
 
@@ -78,3 +82,4 @@ Brython：以 Python 控制 DOM、Canvas、按鈕事件。
 範例按鈕：快速輸入並顯示預設字串。
 
 按下 Enter 鍵也能觸發顯示。
+#
