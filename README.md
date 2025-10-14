@@ -1,5 +1,8 @@
 # Advanced Brython Letter Display
 <img width="1364" height="594" alt="image" src="https://github.com/user-attachments/assets/4a400b6b-0409-4e57-b963-9eb64ede11dc" />
+ 
+ ##  點擊 [此處打開模擬器]( )
+
 
 ## ✨ Advanced Brython 字母顯示器功能
 
