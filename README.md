@@ -9,7 +9,7 @@
  ##  點擊 [此處打開模擬器](https://leceichen.github.io/Advanced-Brython-Letter-Display/ )
 
 
-## ✨ Advanced Brython 字母顯示器功能
+##  Advanced Brython 字母顯示器功能
 
 互動字母視覺化 – 使用 Brython（瀏覽器中的 Python）動態顯示與動畫化字母
 
@@ -26,7 +26,7 @@
 
   
 
- ## ⚙️ 運作原理
+ ##  運作原理
 1️⃣ Brython 與前端結構
 
 Brython 讓 Python 程式可在瀏覽器中運行，取代 JavaScript
