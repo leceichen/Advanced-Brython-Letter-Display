@@ -42,9 +42,6 @@
             font-size: 14px;
         }
         .example-btn { background-color: #45B7D1; }
-        .uppercase-btn { background-color: #96CEB4; }
-        .lowercase-btn { background-color: #DDA0DD; }
-        .number-btn { background-color: #FF9F43; }
         .display-btn { background-color: #4ECDC4; }
         .clear-btn { background-color: #FF6B6B; }
         input[type="text"] {
@@ -53,12 +50,6 @@
             width: 300px;
             border: 2px solid #ddd;
             border-radius: 4px;
-        }
-        .letter-row {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 5px 0;
         }
         .section {
             margin: 20px 0;
@@ -100,90 +91,7 @@
                 <button class="example-btn" data-text="Hello">Hello</button>
                 <button class="example-btn" data-text="Python">Python</button>
                 <button class="example-btn" data-text="code">code</button>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">大寫字母</div>
-            <div class="letter-row">
-                <button class="uppercase-btn" data-text="A">A</button>
-                <button class="uppercase-btn" data-text="B">B</button>
-                <button class="uppercase-btn" data-text="C">C</button>
-                <button class="uppercase-btn" data-text="D">D</button>
-                <button class="uppercase-btn" data-text="E">E</button>
-                <button class="uppercase-btn" data-text="F">F</button>
-                <button class="uppercase-btn" data-text="G">G</button>
-                <button class="uppercase-btn" data-text="H">H</button>
-                <button class="uppercase-btn" data-text="I">I</button>
-                <button class="uppercase-btn" data-text="J">J</button>
-                <button class="uppercase-btn" data-text="K">K</button>
-                <button class="uppercase-btn" data-text="L">L</button>
-                <button class="uppercase-btn" data-text="M">M</button>
-            </div>
-            <div class="letter-row">
-                <button class="uppercase-btn" data-text="N">N</button>
-                <button class="uppercase-btn" data-text="O">O</button>
-                <button class="uppercase-btn" data-text="P">P</button>
-                <button class="uppercase-btn" data-text="Q">Q</button>
-                <button class="uppercase-btn" data-text="R">R</button>
-                <button class="uppercase-btn" data-text="S">S</button>
-                <button class="uppercase-btn" data-text="T">T</button>
-                <button class="uppercase-btn" data-text="U">U</button>
-                <button class="uppercase-btn" data-text="V">V</button>
-                <button class="uppercase-btn" data-text="W">W</button>
-                <button class="uppercase-btn" data-text="X">X</button>
-                <button class="uppercase-btn" data-text="Y">Y</button>
-                <button class="uppercase-btn" data-text="Z">Z</button>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">小寫字母</div>
-            <div class="letter-row">
-                <button class="lowercase-btn" data-text="a">a</button>
-                <button class="lowercase-btn" data-text="b">b</button>
-                <button class="lowercase-btn" data-text="c">c</button>
-                <button class="lowercase-btn" data-text="d">d</button>
-                <button class="lowercase-btn" data-text="e">e</button>
-                <button class="lowercase-btn" data-text="f">f</button>
-                <button class="lowercase-btn" data-text="g">g</button>
-                <button class="lowercase-btn" data-text="h">h</button>
-                <button class="lowercase-btn" data-text="i">i</button>
-                <button class="lowercase-btn" data-text="j">j</button>
-                <button class="lowercase-btn" data-text="k">k</button>
-                <button class="lowercase-btn" data-text="l">l</button>
-                <button class="lowercase-btn" data-text="m">m</button>
-            </div>
-            <div class="letter-row">
-                <button class="lowercase-btn" data-text="n">n</button>
-                <button class="lowercase-btn" data-text="o">o</button>
-                <button class="lowercase-btn" data-text="p">p</button>
-                <button class="lowercase-btn" data-text="q">q</button>
-                <button class="lowercase-btn" data-text="r">r</button>
-                <button class="lowercase-btn" data-text="s">s</button>
-                <button class="lowercase-btn" data-text="t">t</button>
-                <button class="lowercase-btn" data-text="u">u</button>
-                <button class="lowercase-btn" data-text="v">v</button>
-                <button class="lowercase-btn" data-text="w">w</button>
-                <button class="lowercase-btn" data-text="x">x</button>
-                <button class="lowercase-btn" data-text="y">y</button>
-                <button class="lowercase-btn" data-text="z">z</button>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">數字</div>
-            <div class="letter-row">
-                <button class="number-btn" data-text="0">0</button>
-                <button class="number-btn" data-text="1">1</button>
-                <button class="number-btn" data-text="2">2</button>
-                <button class="number-btn" data-text="3">3</button>
-                <button class="number-btn" data-text="4">4</button>
-                <button class="number-btn" data-text="5">5</button>
-                <button class="number-btn" data-text="6">6</button>
-                <button class="number-btn" data-text="7">7</button>
-                <button class="number-btn" data-text="8">8</button>
-                <button class="number-btn" data-text="9">9</button>
+                <button class="example-btn" data-text="A strict teacher produces excellent students">A strict teacher produces excellent students</button>
             </div>
         </div>
     </div>
@@ -342,11 +250,49 @@ class LetterDisplay:
         self.display_container = None
         
     def setup_world(self, text):
-        # 計算需要的世界大小
-        # 每個字母7格寬 + 1格間距，最後一個字母不需要間距
-        num_letters = len(text)
-        world_width = num_letters * 8 - 1 if num_letters > 0 else 0
-        world_height = 7  # 7x7字母
+        # 分割文本为单词
+        words = text.split(' ')
+        
+        # 计算世界大小
+        max_line_width = 0
+        current_line_width = 0
+        line_count = 1
+        
+        for word in words:
+            # 计算单词长度（每个字母7格 + 字母间1格间距）
+            word_length = len(word) * 8 - 1 if len(word) > 0 else 0
+            
+            # 如果单词长度超过6个字母，需要换行
+            if len(word) > 6:
+                # 如果当前行已经有内容，先换行
+                if current_line_width > 0:
+                    line_count += 1
+                    current_line_width = 0
+                
+                # 将长单词分割成多行
+                for i in range(0, len(word), 6):
+                    segment = word[i:i+6]
+                    segment_length = len(segment) * 8 - 1 if len(segment) > 0 else 0
+                    max_line_width = max(max_line_width, segment_length)
+                    
+                    # 如果不是最后一个片段，增加行数
+                    if i + 6 < len(word):
+                        line_count += 1
+            else:
+                # 检查当前行是否能容纳这个单词
+                if current_line_width + word_length > 6 * 8 - 1:
+                    # 需要换行
+                    line_count += 1
+                    current_line_width = word_length
+                else:
+                    # 可以放在当前行
+                    current_line_width += word_length + 1  # +1 是单词间的空格
+                
+                max_line_width = max(max_line_width, current_line_width)
+        
+        # 设置世界大小
+        world_width = max_line_width
+        world_height = line_count * 7  # 每行7格高
         
         self.world = World(world_width, world_height)
         
@@ -369,19 +315,62 @@ class LetterDisplay:
         
         self.world.clear_display()
         
-        # 為每個字母繪製色塊
-        for i, char in enumerate(text):
+        # 分割文本为单词
+        words = text.split(' ')
+        
+        # 当前绘制位置
+        current_x = 0
+        current_y = 0
+        color_index = 0
+        
+        for word in words:
+            # 如果单词长度超过6个字母，需要分割
+            if len(word) > 6:
+                # 如果当前行已经有内容，先换行
+                if current_x > 0:
+                    current_x = 0
+                    current_y += 7
+                
+                # 将长单词分割成多行
+                for i in range(0, len(word), 6):
+                    segment = word[i:i+6]
+                    self._draw_word(segment, current_x, current_y, color_index)
+                    
+                    # 移动到下一行
+                    current_x = 0
+                    current_y += 7
+                    color_index += 1
+            else:
+                # 计算单词长度
+                word_length = len(word) * 8 - 1 if len(word) > 0 else 0
+                
+                # 检查当前行是否能容纳这个单词
+                if current_x + word_length > 6 * 8 - 1:
+                    # 需要换行
+                    current_x = 0
+                    current_y += 7
+                
+                # 绘制单词
+                self._draw_word(word, current_x, current_y, color_index)
+                
+                # 更新位置（单词间加一个空格）
+                current_x += word_length + 1
+                color_index += 1
+    
+    def _draw_word(self, word, start_x, start_y, color_index):
+        # 绘制单词中的所有字母
+        for i, char in enumerate(word):
             if char in LETTER_PATTERNS:
                 pattern = LETTER_PATTERNS[char]
-                # 每個字母佔7格，加上1格間距
-                base_x = i * 8  # 0, 8, 16, ...
-                color = self.colors[i % len(self.colors)]
+                # 每个字母占7格，加上1格间距
+                base_x = start_x + i * 8
+                color = self.colors[color_index % len(self.colors)]
                 
-                # 繪製字母的所有點
+                # 绘制字母的所有点
                 for y in range(7):
                     for x in range(7):
                         if pattern[y][x] == '1':
-                            self.world.draw_color_block(base_x + x, y, color)
+                            self.world.draw_color_block(base_x + x, start_y + y, color)
 
 # ------------------ 初始化 ------------------
 display = LetterDisplay()
@@ -411,15 +400,6 @@ def bind_buttons():
     
     # 綁定所有範例按鈕
     for btn in document.select(".example-btn"):
-        btn.bind("click", on_example_click)
-    
-    for btn in document.select(".uppercase-btn"):
-        btn.bind("click", on_example_click)
-        
-    for btn in document.select(".lowercase-btn"):
-        btn.bind("click", on_example_click)
-        
-    for btn in document.select(".number-btn"):
         btn.bind("click", on_example_click)
     
     # 輸入框回車事件
