@@ -104,16 +104,15 @@
     </div>
 
     <script type="text/python">
-from browser import document, html, timer
+from browser import document, html
 
 CELL_SIZE = 12
-MAX_LETTERS_PER_LINE = 12  # 一行最多12個字母
-LETTER_WIDTH = 8  # 每個字母佔8格（7格字母 + 1格間距）
-SPACE_WIDTH = 8   # 空格佔8格
+MAX_LETTERS_PER_LINE = 12
+LETTER_WIDTH = 8
+SPACE_WIDTH = 8
+LINE_HEIGHT = 8  
 
-# ------------------ 7x7 字母點陣定義（細明體風格，線條粗一格） ------------------
 LETTER_PATTERNS = {
-    # 大寫字母
     'A': ["0011100","0110110","1100011","1100011","1111111","1100011","1100011"],
     'B': ["1111110","1100011","1100011","1111110","1100011","1100011","1111110"],
     'C': ["0111110","1100011","1100000","1100000","1100000","1100011","0111110"],
@@ -140,8 +139,6 @@ LETTER_PATTERNS = {
     'X': ["1100011","0110110","0011100","0001000","0011100","0110110","1100011"],
     'Y': ["1100011","0110110","0011100","0001000","0001000","0001000","0001000"],
     'Z': ["1111111","0000110","0001100","0011000","0110000","1100000","1111111"],
-    
-    # 小寫字母（獨特設計，比例較小）
     'a': ["0000000","0000000","0111100","0000110","0111110","1100110","0111011"],
     'b': ["1100000","1100000","1101100","1110110","1100011","1100011","1111110"],
     'c': ["0000000","0000000","0111110","1100011","1100000","1100011","0111110"],
@@ -168,8 +165,6 @@ LETTER_PATTERNS = {
     'x': ["0000000","0000000","1100011","0110110","0011100","0110110","1100011"],
     'y': ["0000000","0000000","1100011","1100011","0111110","0000110","0111100"],
     'z': ["0000000","0000000","1111111","0000110","0011100","0110000","1111111"],
-    
-    # 數字
     '0': ["0111110","1100011","1100111","1101011","1110011","1100011","0111110"],
     '1': ["0011000","0111000","0011000","0011000","0011000","0011000","0111110"],
     '2': ["0111110","1100011","0000011","0001110","0111000","1100000","1111111"],
@@ -183,7 +178,6 @@ LETTER_PATTERNS = {
     ' ': ["0000000","0000000","0000000","0000000","0000000","0000000","0000000"]
 }
 
-# ------------------ 世界 ------------------
 class World:
     def __init__(self, width, height):
         self.width = width
@@ -236,8 +230,6 @@ class World:
         ctx = self.layers["display"].getContext("2d")
         ctx.fillStyle = color
         ctx.fillRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
-        
-        # 添加邊框
         ctx.strokeStyle = "#333"
         ctx.lineWidth = 1
         ctx.strokeRect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -246,7 +238,6 @@ class World:
         ctx = self.layers["display"].getContext("2d")
         ctx.clearRect(0, 0, self.width*CELL_SIZE, self.height*CELL_SIZE)
 
-# ------------------ 主程式 ------------------
 class LetterDisplay:
     def __init__(self):
         self.world = None
@@ -259,48 +250,35 @@ class LetterDisplay:
         self.display_container = None
         
     def setup_world(self, text):
-        # 分割文本为单词
         words = text.split(' ')
-        
-        # 计算世界大小
         max_line_width = 0
         current_line_width = 0
         line_count = 1
         
         for word in words:
-            # 计算单词长度（字母数量）
             word_letter_count = len(word)
-            
-            # 检查当前行是否能容纳这个单词
             if current_line_width + word_letter_count > MAX_LETTERS_PER_LINE:
-                # 需要换行
                 line_count += 1
                 current_line_width = word_letter_count
             else:
-                # 可以放在当前行
                 if current_line_width > 0:
-                    current_line_width += 1  # 单词间空格
+                    current_line_width += 1
                 current_line_width += word_letter_count
-            
             max_line_width = max(max_line_width, current_line_width)
         
-        # 设置世界大小 - 一行最多12个字母
         world_width = MAX_LETTERS_PER_LINE * LETTER_WIDTH
-        world_height = line_count * 7  # 每行7格高
+        world_height = line_count * LINE_HEIGHT
         
         self.world = World(world_width, world_height)
         
     def display_text(self, text):
         if not text:
-            # 如果文字為空，清除顯示
             if self.world:
                 self.world.clear_display()
             return
             
-        # 保留原始大小寫，分別處理
         self.setup_world(text)
         
-        # 清除之前的顯示
         if self.display_container:
             self.display_container.remove()
             
@@ -309,10 +287,7 @@ class LetterDisplay:
         
         self.world.clear_display()
         
-        # 分割文本为单词
         words = text.split(' ')
-        
-        # 当前绘制位置
         current_x = 0
         current_y = 0
         current_line_letters = 0
@@ -320,85 +295,64 @@ class LetterDisplay:
         
         for word in words:
             word_letter_count = len(word)
-            
-            # 检查当前行是否能容纳这个单词
             if current_line_letters + word_letter_count > MAX_LETTERS_PER_LINE:
-                # 需要换行
                 current_x = 0
-                current_y += 7
+                current_y += LINE_HEIGHT
                 current_line_letters = 0
             
-            # 绘制单词
             self._draw_word(word, current_x, current_y, color_index)
-            
-            # 更新位置
             current_x += word_letter_count * LETTER_WIDTH
             current_line_letters += word_letter_count
             
-            # 如果不是最后一个单词，添加空格
             if word != words[-1]:
                 current_x += SPACE_WIDTH
-                current_line_letters += 1  # 空格也算一个位置
+                current_line_letters += 1
             
             color_index += 1
     
     def _draw_word(self, word, start_x, start_y, color_index):
-        # 绘制单词中的所有字母
         for i, char in enumerate(word):
             if char in LETTER_PATTERNS:
                 pattern = LETTER_PATTERNS[char]
-                # 每个字母占7格，加上1格间距
                 base_x = start_x + i * LETTER_WIDTH
                 color = self.colors[color_index % len(self.colors)]
-                
-                # 绘制字母的所有点
                 for y in range(7):
                     for x in range(7):
                         if pattern[y][x] == '1':
                             self.world.draw_color_block(base_x + x, start_y + y, color)
 
-# ------------------ 初始化 ------------------
 display = LetterDisplay()
 
-# 綁定按鈕事件
 def bind_buttons():
-    # 顯示按鈕
     def on_display_click(ev):
         text = document["textInput"].value.strip()
         if text:
             display.display_text(text)
     
-    # 清除按鈕
     def on_clear_click(ev):
         document["textInput"].value = ""
         display.display_text("")
     
-    # 範例按鈕
     def on_example_click(ev):
         text = ev.target.attrs.get("data-text", "")
         document["textInput"].value = text
         display.display_text(text)
     
-    # 綁定主要按鈕
     document["displayBtn"].bind("click", on_display_click)
     document["clearBtn"].bind("click", on_clear_click)
     
-    # 綁定所有範例按鈕
     for btn in document.select(".example-btn"):
         btn.bind("click", on_example_click)
     
-    # 輸入框回車事件
     def on_input_enter(ev):
         if ev.key == 'Enter':
             on_display_click(ev)
     
     document["textInput"].bind("keypress", on_input_enter)
 
-# 初始顯示範例
 def init_display():
     display.display_text("AaBbCc")
 
-# 啟動時執行
 bind_buttons()
 init_display()
     </script>
