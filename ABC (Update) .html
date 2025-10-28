@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>字母數字顯示器</title>
+    <title>像素風格3D列印字體生成器</title>
     <script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js"></script>
     <style>
@@ -44,6 +44,8 @@
         .example-btn { background-color: #45B7D1; }
         .display-btn { background-color: #4ECDC4; }
         .clear-btn { background-color: #FF6B6B; }
+        .print-btn { background-color: #9B59B6; }
+        .download-btn { background-color: #27AE60; }
         input[type="text"] {
             padding: 8px;
             font-size: 16px;
@@ -69,48 +71,132 @@
             border: 1px solid #ddd;
             padding: 10px;
             background: white;
+            margin-bottom: 20px;
+        }
+        .print-params {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 6px;
+        }
+        .param-group {
+            margin-bottom: 10px;
+        }
+        .param-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .param-group input, .param-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .gcode-container {
+            max-height: 400px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f8f8f8;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .info-panel {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #45B7D1;
         }
     </style>
 </head>
 <body onload="brython()">
     <div class="container">
-        <h1>字母數字顯示器</h1>
-        <p style="text-align: center; color: #666;">
-            輸入英文字母或數字（大小寫有不同設計），程式會用彩色方塊顯示7x7細明體風格字體
-        </p>
+        <h1>像素風格3D列印字體生成器</h1>
         
+        <div class="info-panel">
+            <strong>功能說明：</strong> 輸入文字生成像素風格3D列印G-code，每個像素點會轉換為3D列印的方塊
+        </div>
+
         <div class="input-group">
             <input type="text" id="textInput" placeholder="輸入字母或數字...">
-            <button class="display-btn" id="displayBtn">顯示</button>
+            <button class="display-btn" id="displayBtn">顯示預覽</button>
+            <button class="print-btn" id="printBtn">生成3D列印G-code</button>
+            <button class="download-btn" id="downloadBtn" disabled>下載G-code</button>
             <button class="clear-btn" id="clearBtn">清除</button>
+        </div>
+
+        <div class="print-params">
+            <div class="param-group">
+                <label for="pixelSize">像素方塊尺寸 (mm)</label>
+                <input type="number" id="pixelSize" value="5" min="2" max="20">
+            </div>
+            <div class="param-group">
+                <label for="layerHeight">層高 (mm)</label>
+                <input type="number" id="layerHeight" value="0.2" step="0.05" min="0.1" max="0.4">
+            </div>
+            <div class="param-group">
+                <label for="blockHeight">方塊高度 (mm)</label>
+                <input type="number" id="blockHeight" value="2" min="0.5" max="10">
+            </div>
+            <div class="param-group">
+                <label for="printSpeed">列印速度 (mm/s)</label>
+                <input type="number" id="printSpeed" value="50" min="20" max="150">
+            </div>
+            <div class="param-group">
+                <label for="nozzleTemp">噴頭溫度 (°C)</label>
+                <input type="number" id="nozzleTemp" value="210" min="180" max="280">
+            </div>
+            <div class="param-group">
+                <label for="bedTemp">熱床溫度 (°C)</label>
+                <input type="number" id="bedTemp" value="60" min="0" max="100">
+            </div>
+            <div class="param-group">
+                <label for="printStyle">列印樣式</label>
+                <select id="printStyle">
+                    <option value="solid">實心方塊</option>
+                    <option value="outline">輪廓線框</option>
+                </select>
+            </div>
         </div>
 
         <div class="section">
             <div class="section-title">快速範例</div>
             <div class="button-group">
                 <button class="example-btn" data-text="ABC">ABC</button>
-                <button class="example-btn" data-text="abc">abc</button>
-                <button class="example-btn" data-text="AaBbCc">AaBbCc</button>
-                <button class="example-btn" data-text="CP2025">CP2025</button>
+                <button class="example-btn" data-text="HELLO">HELLO</button>
+                <button class="example-btn" data-text="3DPRINT">3DPRINT</button>
                 <button class="example-btn" data-text="NFU">NFU</button>
-                <button class="example-btn" data-text="Hello">Hello</button>
-                <button class="example-btn" data-text="Python">Python</button>
-                <button class="example-btn" data-text="code">code</button>
-                <button class="example-btn" data-text="A strict teacher produces excellent students">A strict teacher produces excellent students</button>
+                <button class="example-btn" data-text="PIXEL">PIXEL</button>
+                <button class="example-btn" data-text="2024">2024</button>
             </div>
         </div>
 
         <div class="display-container" id="brython_div1"></div>
+
+        <div class="section">
+            <div class="section-title">3D列印G-code預覽</div>
+            <div class="gcode-container" id="gcodePreview">
+                生成G-code後將顯示在這裡...
+            </div>
+        </div>
     </div>
 
     <script type="text/python">
-from browser import document, html
+from browser import document, html, window, alert
+import math
 
 CELL_SIZE = 12
 MAX_LETTERS_PER_LINE = 12
 LETTER_WIDTH = 8
 SPACE_WIDTH = 8
-LINE_HEIGHT = 8  
+LINE_HEIGHT = 8
 
 LETTER_PATTERNS = {
     'A': ["0011100","0110110","1100011","1100011","1111111","1100011","1100011"],
@@ -139,32 +225,6 @@ LETTER_PATTERNS = {
     'X': ["1100011","0110110","0011100","0001000","0011100","0110110","1100011"],
     'Y': ["1100011","0110110","0011100","0001000","0001000","0001000","0001000"],
     'Z': ["1111111","0000110","0001100","0011000","0110000","1100000","1111111"],
-    'a': ["0000000","0000000","0111100","0000110","0111110","1100110","0111011"],
-    'b': ["1100000","1100000","1101100","1110110","1100011","1100011","1111110"],
-    'c': ["0000000","0000000","0111110","1100011","1100000","1100011","0111110"],
-    'd': ["0000011","0000011","0011011","0110111","1100011","1100011","0111111"],
-    'e': ["0000000","0000000","0111110","1100011","1111111","1100000","0111110"],
-    'f': ["0011110","0110011","0110000","1111100","0110000","0110000","0110000"],
-    'g': ["0000000","0111011","1100110","1100110","0111110","0000110","0111100"],
-    'h': ["1100000","1100000","1101100","1110110","1100011","1100011","1100011"],
-    'i': ["0011000","0000000","0111000","0011000","0011000","0011000","0111100"],
-    'j': ["0001100","0000000","0011100","0001100","0001100","1101100","0111000"],
-    'k': ["1100000","1100000","1100110","1101100","1111000","1101100","1100110"],
-    'l': ["0111000","0011000","0011000","0011000","0011000","0011000","0111100"],
-    'm': ["0000000","0000000","1110110","1111111","1101011","1100011","1100011"],
-    'n': ["0000000","0000000","1101100","1110110","1100011","1100011","1100011"],
-    'o': ["0000000","0000000","0111110","1100011","1100011","1100011","0111110"],
-    'p': ["0000000","0000000","1101100","1110110","1100011","1111110","1100000"],
-    'q': ["0000000","0000000","0011011","0110111","1100011","0111111","0000011"],
-    'r': ["0000000","0000000","1101110","1110011","1100000","1100000","1100000"],
-    's': ["0000000","0000000","0111110","1100000","0111110","0000011","1111110"],
-    't': ["0110000","0110000","1111100","0110000","0110000","0110011","0011110"],
-    'u': ["0000000","0000000","1100011","1100011","1100011","1100111","0111011"],
-    'v': ["0000000","0000000","1100011","1100011","1100011","0110110","0011100"],
-    'w': ["0000000","0000000","1100011","1100011","1101011","1111111","0110110"],
-    'x': ["0000000","0000000","1100011","0110110","0011100","0110110","1100011"],
-    'y': ["0000000","0000000","1100011","1100011","0111110","0000110","0111100"],
-    'z': ["0000000","0000000","1111111","0000110","0011100","0110000","1111111"],
     '0': ["0111110","1100011","1100111","1101011","1110011","1100011","0111110"],
     '1': ["0011000","0111000","0011000","0011000","0011000","0011000","0111110"],
     '2': ["0111110","1100011","0000011","0001110","0111000","1100000","1111111"],
@@ -177,6 +237,157 @@ LETTER_PATTERNS = {
     '9': ["0111110","1100011","1100011","0111111","0000011","0000011","0111110"],
     ' ': ["0000000","0000000","0000000","0000000","0000000","0000000","0000000"]
 }
+
+class Pixel3DPrinter:
+    def __init__(self):
+        self.gcode = ""
+        self.filename = "pixel_text.gcode"
+        self.pixel_data = []
+        
+    def generate_gcode(self, text, params):
+        pixel_size = float(params['pixelSize'])
+        layer_height = float(params['layerHeight'])
+        block_height = float(params['blockHeight'])
+        print_speed = int(params['printSpeed'])
+        nozzle_temp = int(params['nozzleTemp'])
+        bed_temp = int(params['bedTemp'])
+        print_style = params['printStyle']
+        
+        # 生成像素數據
+        self.pixel_data = self._text_to_pixels(text.upper())
+        
+        gcode = []
+        
+        # G-code 頭部
+        gcode.append("; 像素風格3D列印G-code")
+        gcode.append(f"; 文字: {text}")
+        gcode.append(f"; 像素尺寸: {pixel_size}mm")
+        gcode.append(f"; 方塊高度: {block_height}mm")
+        gcode.append("")
+        
+        gcode.append("; 初始化設定")
+        gcode.append("G21 ; 毫米單位")
+        gcode.append("G90 ; 絕對座標")
+        gcode.append("M82 ; 絕對擠出")
+        gcode.append("")
+        
+        gcode.append("; 加熱設定")
+        gcode.append(f"M104 S{nozzle_temp} ; 設定噴頭溫度")
+        gcode.append(f"M140 S{bed_temp} ; 設定熱床溫度")
+        gcode.append("")
+        
+        gcode.append("; 等待加熱")
+        gcode.append(f"M190 S{bed_temp} ; 等待熱床達到溫度")
+        gcode.append(f"M109 S{nozzle_temp} ; 等待噴頭達到溫度")
+        gcode.append("")
+        
+        gcode.append("; 初始移動")
+        gcode.append("G28 ; 所有軸歸零")
+        gcode.append("G1 Z5 F3000 ; 抬升噴頭")
+        gcode.append("")
+        
+        # 計算總層數
+        total_layers = int(block_height / layer_height)
+        
+        # 生成像素方塊的列印路徑
+        gcode.append("; 開始列印像素方塊")
+        gcode.append(f"; 總層數: {total_layers}")
+        gcode.append("")
+        
+        for layer in range(total_layers):
+            current_z = layer * layer_height + 0.2
+            gcode.append(f"; 第 {layer + 1} 層, Z={current_z:.2f}mm")
+            gcode.append(f"G1 Z{current_z:.2f} F3000")
+            
+            for pixel in self.pixel_data:
+                x, y = pixel
+                actual_x = x * pixel_size + 10  # 加上邊距
+                actual_y = y * pixel_size + 10
+                
+                if print_style == "solid":
+                    # 實心方塊 - 列印實心矩形
+                    gcode.extend(self._print_solid_block(actual_x, actual_y, pixel_size, print_speed))
+                else:
+                    # 輪廓線框 - 只列印邊框
+                    gcode.extend(self._print_outline_block(actual_x, actual_y, pixel_size, print_speed))
+                
+                gcode.append("")
+        
+        # G-code 尾部
+        gcode.append("; 列印完成")
+        gcode.append("G1 Z10 F3000 ; 抬升噴頭")
+        gcode.append("M104 S0 ; 關閉噴頭加熱")
+        gcode.append("M140 S0 ; 關閉熱床加熱")
+        gcode.append("G28 X Y ; X/Y軸歸零")
+        gcode.append("M84 ; 關閉步進馬達")
+        gcode.append("M30 ; 程式結束")
+        
+        return "\n".join(gcode)
+    
+    def _text_to_pixels(self, text):
+        pixels = []
+        x_offset = 0
+        
+        for char in text:
+            if char in LETTER_PATTERNS:
+                pattern = LETTER_PATTERNS[char]
+                for y in range(7):
+                    for x in range(7):
+                        if pattern[y][x] == '1':
+                            pixels.append((x_offset + x, y))
+                x_offset += 8  # 字母寬度 + 間距
+            elif char == ' ':
+                x_offset += 4  # 空格寬度
+        
+        return pixels
+    
+    def _print_solid_block(self, start_x, start_y, size, speed):
+        commands = []
+        # 移動到方塊起始位置
+        commands.append(f"G1 X{start_x:.2f} Y{start_y:.2f} F{speed * 60}")
+        commands.append("G1 E0.4 F300 ; 開始擠出")
+        
+        # 列印實心方塊（簡化為外框填充）
+        commands.append(f"G1 X{start_x + size:.2f} Y{start_y:.2f} E0.8 F{speed * 60}")
+        commands.append(f"G1 X{start_x + size:.2f} Y{start_y + size:.2f} E0.8")
+        commands.append(f"G1 X{start_x:.2f} Y{start_y + size:.2f} E0.8")
+        commands.append(f"G1 X{start_x:.2f} Y{start_y:.2f} E0.8")
+        
+        commands.append("G1 E-0.4 F1800 ; 回抽")
+        return commands
+    
+    def _print_outline_block(self, start_x, start_y, size, speed):
+        commands = []
+        # 移動到方塊起始位置
+        commands.append(f"G1 X{start_x:.2f} Y{start_y:.2f} F{speed * 60}")
+        commands.append("G1 E0.4 F300 ; 開始擠出")
+        
+        # 列印方塊輪廓
+        commands.append(f"G1 X{start_x + size:.2f} Y{start_y:.2f} E0.8 F{speed * 60}")
+        commands.append(f"G1 X{start_x + size:.2f} Y{start_y + size:.2f} E0.8")
+        commands.append(f"G1 X{start_x:.2f} Y{start_y + size:.2f} E0.8")
+        commands.append(f"G1 X{start_x:.2f} Y{start_y:.2f} E0.8")
+        
+        commands.append("G1 E-0.4 F1800 ; 回抽")
+        return commands
+    
+    def download_gcode(self, filename=None):
+        if not self.gcode:
+            alert("沒有可下載的G-code")
+            return
+            
+        if filename:
+            self.filename = filename
+            
+        blob = window.Blob.new([self.gcode], {"type": "text/plain"})
+        url = window.URL.createObjectURL(blob)
+        
+        link = html.A(href=url, download=self.filename)
+        link.style.display = "none"
+        document <= link
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
 
 class World:
     def __init__(self, width, height):
@@ -243,9 +454,7 @@ class LetterDisplay:
         self.world = None
         self.colors = [
             "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", 
-            "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F",
-            "#FF9FF3", "#54A0FF", "#5F27CD", "#00D2D3",
-            "#FF9F43", "#10AC84"
+            "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F"
         ]
         self.display_container = None
         
@@ -321,7 +530,9 @@ class LetterDisplay:
                         if pattern[y][x] == '1':
                             self.world.draw_color_block(base_x + x, start_y + y, color)
 
+# 初始化組件
 display = LetterDisplay()
+printer = Pixel3DPrinter()
 
 def bind_buttons():
     def on_display_click(ev):
@@ -329,16 +540,52 @@ def bind_buttons():
         if text:
             display.display_text(text)
     
+    def on_print_click(ev):
+        text = document["textInput"].value.strip()
+        if not text:
+            alert("請輸入要列印的文字")
+            return
+        
+        params = {
+            'pixelSize': document["pixelSize"].value,
+            'layerHeight': document["layerHeight"].value,
+            'blockHeight': document["blockHeight"].value,
+            'printSpeed': document["printSpeed"].value,
+            'nozzleTemp': document["nozzleTemp"].value,
+            'bedTemp': document["bedTemp"].value,
+            'printStyle': document["printStyle"].value
+        }
+        
+        printer.gcode = printer.generate_gcode(text, params)
+        document["gcodePreview"].textContent = printer.gcode
+        document["downloadBtn"].disabled = False
+        
+        alert(f"3D列印G-code生成完成！\n文字: {text}\n像素尺寸: {params['pixelSize']}mm")
+    
+    def on_download_click(ev):
+        text = document["textInput"].value.strip()
+        if text:
+            filename = f"pixel_{text}.gcode"
+            printer.download_gcode(filename)
+        else:
+            printer.download_gcode()
+    
     def on_clear_click(ev):
         document["textInput"].value = ""
-        display.display_text("")
+        document["gcodePreview"].textContent = "生成G-code後將顯示在這裡..."
+        document["downloadBtn"].disabled = True
+        if display.world:
+            display.world.clear_display()
     
     def on_example_click(ev):
         text = ev.target.attrs.get("data-text", "")
         document["textInput"].value = text
         display.display_text(text)
     
+    # 綁定事件
     document["displayBtn"].bind("click", on_display_click)
+    document["printBtn"].bind("click", on_print_click)
+    document["downloadBtn"].bind("click", on_download_click)
     document["clearBtn"].bind("click", on_clear_click)
     
     for btn in document.select(".example-btn"):
@@ -350,11 +597,12 @@ def bind_buttons():
     
     document["textInput"].bind("keypress", on_input_enter)
 
-def init_display():
-    display.display_text("AaBbCc")
-
+# 初始化
 bind_buttons()
-init_display()
+
+# 預設顯示範例
+document["textInput"].value = "PIXEL"
+display.display_text("PIXEL")
     </script>
 </body>
 </html>
