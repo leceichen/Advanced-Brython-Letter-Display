@@ -90,7 +90,11 @@ Brython：以 Python 控制 DOM、Canvas、按鈕事件
 
 ##
 
-##1.
+## 7X7 Lab
+
+
+
+
 
 
 
