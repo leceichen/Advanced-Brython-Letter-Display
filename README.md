@@ -1,3 +1,5 @@
+
+
 # Brython Letter Display (字母顯示器) 
 
 ### 這是一個以 Brython（Python for Browser） 撰寫的互動式網頁程式，能將使用者輸入的英文字母或數字，轉換成由 7×7 彩色方格 組成的像素字
